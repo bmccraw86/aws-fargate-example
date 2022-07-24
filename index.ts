@@ -21,6 +21,9 @@ const listener = new awsx.elasticloadbalancingv2.NetworkListener("nginx", {
 //     loadBalancerArn: alb.arn
 // });
 
+// Export the URL so we can easily access it.
+export const frontendURL = pulumi.interpolate `http://${listener.endpoint.hostname}/`;
+
 // Define the service, building and publishing our "./app/Dockerfile", and using the load balancer.
 const service1 = new awsx.ecs.FargateService("nginx", {
     desiredCount: 1,
@@ -35,20 +38,20 @@ const service1 = new awsx.ecs.FargateService("nginx", {
         },
     },
 });
+
+const nlbUrl= `http://${listener.endpoint.hostname}/`
 const service2 = new awsx.ecs.FargateService("siege", {
-    desiredCount: 1,
+    desiredCount: 0,
     taskDefinitionArgs: {
         containers: {
-            nginx: {
+            siege: {
                 // image: awsx.ecs.Image.fromPath("nginx", "./app"),
-                image: 'bmccraw86/nginx-example:latest',
+                image: 'bmccraw86/docker-siege:latest',
                 memory: 512,
-                portMappings: [listener],
+                command: ['-d1', '-r10', '-c25', nlbUrl]
             },
         },
     },
 });
 
-// Export the URL so we can easily access it.
-export const frontendURL = pulumi.interpolate `http://${listener.endpoint.hostname}/`;
 
