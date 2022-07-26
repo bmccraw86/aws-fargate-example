@@ -40,18 +40,18 @@ const service1 = new awsx.ecs.FargateService("nginx", {
 });
 
 const nlbUrl= `http://${listener.endpoint.hostname}/`
-const service2 = new awsx.ecs.FargateService("siege", {
-    desiredCount: 0,
-    taskDefinitionArgs: {
-        containers: {
-            siege: {
-                // image: awsx.ecs.Image.fromPath("nginx", "./app"),
-                image: 'bmccraw86/docker-siege:latest',
-                memory: 512,
-                command: ['-d1', '-r10', '-c25', nlbUrl]
-            },
-        },
-    },
-});
+// const service2 = new awsx.ecs.FargateService("siege", {
+//     desiredCount: 0,
+//     taskDefinitionArgs: {
+//         containers: {
+//             siege: {
+//                 // image: awsx.ecs.Image.fromPath("nginx", "./app"),
+//                 image: 'bmccraw86/docker-siege:latest',
+//                 memory: 512,
+//                 command: ['-d1', '-r10', '-c25', nlbUrl]
+//             },
+//         },
+//     },
+// });
 
 
