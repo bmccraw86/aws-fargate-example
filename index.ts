@@ -4,7 +4,10 @@ import { getListenerOutput, getLoadBalancerOutput } from "@pulumi/aws/alb";
 
 // Create a load balancer to listen for requests and route them to the container.
 const listener = new awsx.elasticloadbalancingv2.NetworkListener("nginx", { 
-    port: 80,
+    port: 8080,
+});
+const listener_443 = new awsx.elasticloadbalancingv2.NetworkListener("nginx", { 
+    port: 443,
 });
 
 // const alb = getLoadBalancerOutput({
@@ -25,13 +28,13 @@ const listener = new awsx.elasticloadbalancingv2.NetworkListener("nginx", {
 export const frontendURL = pulumi.interpolate `http://${listener.endpoint.hostname}/`;
 
 // Define the service, building and publishing our "./app/Dockerfile", and using the load balancer.
-const service1 = new awsx.ecs.FargateService("nginx", {
+const service1 = new awsx.ecs.FargateService("snap", {
     desiredCount: 1,
     taskDefinitionArgs: {
         containers: {
-            nginx: {
+            snap: {
                 // image: awsx.ecs.Image.fromPath("nginx", "./app"),
-                image: 'bmccraw86/nginx-example:latest',
+                image: 'mrhoden/snap:latest',
                 memory: 512,
                 portMappings: [listener],
             },
